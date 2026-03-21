@@ -1,4 +1,6 @@
-# 2583 Scouting App
+[<img src="public/logo512.png" width="250"/>](logo)
+
+# Orange Scout
 
 ### What does it do?
 This is a simple FRC scouting app, it's served as a <a target="_blank" href="https://www.google.com/search?q=pwa">PWA</a> so you can use it during comps with little or no connection. All data is uploaded directly and formatted in Google sheets and is locally stored until then. 
@@ -15,10 +17,10 @@ Each saved entry is stored locally and can be edited or deleted before upload.
 
 ### Todo:
 
- - [x] Create basic auth for bad requests
+ - [ ] Create basic auth for bad requests
  - [ ] Add push notifications?
- - [ ] Redo icon
- - [ ] Redo UI/UX
+ - [x] Redo icon
+ - [x] Redo UI/UX
 
 ## Deployment Setup
 

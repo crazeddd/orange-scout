@@ -10,12 +10,11 @@ export const emptyForm = (scoutName: string): ScoutFormData => ({
   teamNumber: 0,
   startingPosition: 'trench',
   alliance: 'red',
-  autonPoints: 0,
-  autonClimbLevel: 'L1',
-  teleopPoints: 0,
-  teleopClimbLevel: 'L1',
+  autonClimbLevel: 'none',
+  teleopClimbLevel: 'none',
   playedDefense: false,
-  accuracyPercentage: '0%',
+  teamPointsPercentage: 0,
+  accuracyPercentage: 0,
   notes: ''
 });
 
@@ -25,7 +24,12 @@ export const parseStoredEntries = (): ScoutEntry[] => {
 
   try {
     const parsed = JSON.parse(raw) as ScoutEntry[];
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((entry) => ({
+      ...entry,
+      teamPointsPercentage: typeof entry.teamPointsPercentage === 'number' ? entry.teamPointsPercentage : 0,
+      accuracyPercentage: typeof entry.accuracyPercentage === 'number' ? entry.accuracyPercentage : 0
+    }));
   } catch {
     return [];
   }
@@ -50,10 +54,12 @@ export const emptyPitForm = (scoutName = ''): PitFormData => ({
   scoutName,
   teamNumber: 0,
   drivetrain: 'swerve',
+  fuelCapacity: 0,
   autonomousSummary: '',
   teleopSummary: '',
   climbCapability: 'none',
-  expectedRole: 'flex',
+  canGoUnderTrench: false,
+  canGoOverBump: false,
   notes: ''
 });
 
@@ -63,7 +69,13 @@ export const parseStoredPitEntries = (): PitEntry[] => {
 
   try {
     const parsed = JSON.parse(raw) as PitEntry[];
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((entry) => ({
+      ...entry,
+      fuelCapacity: typeof entry.fuelCapacity === 'number' ? entry.fuelCapacity : 0,
+      canGoUnderTrench: typeof entry.canGoUnderTrench === 'boolean' ? entry.canGoUnderTrench : false,
+      canGoOverBump: typeof entry.canGoOverBump === 'boolean' ? entry.canGoOverBump : false
+    }));
   } catch {
     return [];
   }

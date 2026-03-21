@@ -1,11 +1,12 @@
 import { Plus, Save } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Checkbox } from '../components/ui/checkbox';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Textarea } from '../components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
 import { ScoutFormData } from '../model/types';
 import { parseNumberInput } from '../model/utils';
 
@@ -28,7 +29,7 @@ export function ScoutingPage({
     <Card>
       <CardHeader>
         <CardTitle>{editingId ? 'Edit Scouting Entry' : 'Add Scouting Entry'}</CardTitle>
-        <CardDescription>Uses your shared scout name from the sidebar for all saved entries.</CardDescription>
+        <CardDescription>Yeah.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid gap-3 sm:grid-cols-2">
@@ -55,7 +56,7 @@ export function ScoutingPage({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="startingPosition">Starting Position</Label>
+            <Label htmlFor="startingPosition">Starting Position (field orientated)</Label>
             <Select
               value={form.startingPosition}
               onValueChange={(value) => updateForm('startingPosition', value as ScoutFormData['startingPosition'])}
@@ -64,9 +65,12 @@ export function ScoutingPage({
                 <SelectValue placeholder="Select position" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="trench">Trench</SelectItem>
                 <SelectItem value="hub">Hub</SelectItem>
-                <SelectItem value="bump">Bump</SelectItem>
+                <SelectItem value="trench">Trench (left)</SelectItem>
+                <SelectItem value="fender">Trench (right)</SelectItem>
+                <SelectItem value="bump">Bump (left)</SelectItem>
+                <SelectItem value="other">Bump (right)</SelectItem>
+
               </SelectContent>
             </Select>
           </div>
@@ -92,17 +96,6 @@ export function ScoutingPage({
             <legend className="px-1 text-sm font-semibold text-[var(--txt)]">Auton</legend>
             <div className="space-y-3">
               <div className="space-y-2">
-                <Label htmlFor="autonPoints">Points Scored</Label>
-                <Input
-                  id="autonPoints"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={String(form.autonPoints)}
-                  onChange={(event) => updateForm('autonPoints', parseNumberInput(event.target.value, 0))}
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="autonClimbLevel">Climb Level</Label>
                 <Select
                   value={form.autonClimbLevel}
@@ -112,9 +105,9 @@ export function ScoutingPage({
                     <SelectValue placeholder="Select level" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="none">No Climb</SelectItem>
+                    <SelectItem value="failed">Failed Climb</SelectItem>
                     <SelectItem value="L1">L1</SelectItem>
-                    <SelectItem value="L2">L2</SelectItem>
-                    <SelectItem value="L3">L3</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -125,17 +118,6 @@ export function ScoutingPage({
             <legend className="px-1 text-sm font-semibold text-[var(--txt)]">Teleop</legend>
             <div className="space-y-3">
               <div className="space-y-2">
-                <Label htmlFor="teleopPoints">Points Scored</Label>
-                <Input
-                  id="teleopPoints"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={String(form.teleopPoints)}
-                  onChange={(event) => updateForm('teleopPoints', parseNumberInput(event.target.value, 0))}
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="teleopClimbLevel">Climb Level</Label>
                 <Select
                   value={form.teleopClimbLevel}
@@ -145,20 +127,24 @@ export function ScoutingPage({
                     <SelectValue placeholder="Select level" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="none">No Climb</SelectItem>
+                    <SelectItem value="failed">Failed Climb</SelectItem>
                     <SelectItem value="L1">L1</SelectItem>
                     <SelectItem value="L2">L2</SelectItem>
                     <SelectItem value="L3">L3</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <label className="flex items-center gap-2 text-sm text-[var(--txt-light)]" htmlFor="playedDefense">
+              <div className="flex items-center gap-2">
                 <Checkbox
                   id="playedDefense"
                   checked={form.playedDefense}
                   onCheckedChange={(checked) => updateForm('playedDefense', checked === true)}
                 />
-                Played Defense?
-              </label>
+                <Label htmlFor="playedDefense" className="text-sm text-[var(--txt-light)]">
+                  Played Defense?
+                </Label>
+              </div>
             </div>
           </fieldset>
         </div>
@@ -167,22 +153,32 @@ export function ScoutingPage({
           <legend className="px-1 text-sm font-semibold text-[var(--txt)]">Overall</legend>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-2">
+              <Label htmlFor="teamPointsPercentage">% of Team Points Scored</Label>
+              <div className="space-y-2">
+                <Slider
+                  id="teamPointsPercentage"
+                  min={0}
+                  max={100}
+                  step={5}
+                  value={[form.teamPointsPercentage]}
+                  onValueChange={(value) => updateForm('teamPointsPercentage', value[0] ?? 0)}
+                />
+                <div className="text-xs text-[var(--txt-light)]">{form.teamPointsPercentage}%</div>
+              </div>
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="accuracyPercentage">Accuracy Percentage</Label>
-              <Select
-                value={form.accuracyPercentage}
-                onValueChange={(value) => updateForm('accuracyPercentage', value as ScoutFormData['accuracyPercentage'])}
-              >
-                <SelectTrigger id="accuracyPercentage">
-                  <SelectValue placeholder="Select accuracy" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="0%">0%</SelectItem>
-                  <SelectItem value="25%">25%</SelectItem>
-                  <SelectItem value="50%">50%</SelectItem>
-                  <SelectItem value="75%">75%</SelectItem>
-                  <SelectItem value="100%">100%</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Slider
+                  id="accuracyPercentage"
+                  min={0}
+                  max={100}
+                  step={5}
+                  value={[form.accuracyPercentage]}
+                  onValueChange={(value) => updateForm('accuracyPercentage', value[0] ?? 0)}
+                />
+                <div className="text-xs text-[var(--txt-light)]">{form.accuracyPercentage}%</div>
+              </div>
             </div>
             <div className="space-y-2 sm:col-span-2">
               <Label htmlFor="notes">Notes</Label>

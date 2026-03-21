@@ -1,7 +1,6 @@
-export type Position = 'trench' | 'hub' | 'bump';
+export type Position = 'trench' | 'hub' | 'bump' | 'fender' | 'other';
 export type Alliance = 'red' | 'blue';
-export type ClimbLevel = 'L1' | 'L2' | 'L3';
-export type Accuracy = '0%' | '25%' | '50%' | '75%' | '100%';
+export type ClimbLevel = 'L1' | 'L2' | 'L3' | 'none' | 'failed';
 export type Drivetrain = 'swerve' | 'tank' | 'mecanum' | 'other';
 
 export type ActivePage = 'entry' | 'entries' | 'pit';
@@ -20,12 +19,11 @@ export type ScoutEntry = {
   teamNumber: number;
   startingPosition: Position;
   alliance: Alliance;
-  autonPoints: number;
   autonClimbLevel: ClimbLevel;
-  teleopPoints: number;
   teleopClimbLevel: ClimbLevel;
   playedDefense: boolean;
-  accuracyPercentage: Accuracy;
+  teamPointsPercentage: number;
+  accuracyPercentage: number;
   notes: string;
 };
 
@@ -34,14 +32,17 @@ export type ScoutFormData = Omit<ScoutEntry, 'id' | 'createdAt' | 'uploadedAt'>;
 export type PitEntry = {
   id: string;
   createdAt: string;
+  uploadedAt?: string;
   scoutName: string;
   teamNumber: number;
   drivetrain: Drivetrain;
+  fuelCapacity: number;
   autonomousSummary: string;
   teleopSummary: string;
-  climbCapability: ClimbLevel | 'none';
-  expectedRole: 'offense' | 'defense' | 'flex';
+  climbCapability: ClimbLevel;
+  canGoUnderTrench: boolean;
+  canGoOverBump: boolean;
   notes: string;
 };
 
-export type PitFormData = Omit<PitEntry, 'id' | 'createdAt'>;
+export type PitFormData = Omit<PitEntry, 'id' | 'createdAt' | 'uploadedAt'>;

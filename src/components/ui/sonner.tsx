@@ -1,43 +1,50 @@
-import { Toaster as SonnerToaster, toast } from 'sonner';
-import type { ToasterProps } from 'sonner';
-import 'sonner/dist/styles.css';
-import { AppMessage } from '../../model/types';
-import { cn } from '../../utils/utils';
+"use client"
 
-export function showAppToast(message: AppMessage) {
-  if (message.type === 'error') {
-    toast.error(message.text);
-    return;
-  }
+import { useTheme } from "next-themes"
+import { Toaster as Sonner, type ToasterProps } from "sonner"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { CheckmarkCircle02Icon, InformationCircleIcon, Alert02Icon, MultiplicationSignCircleIcon, Loading03Icon } from "@hugeicons/core-free-icons"
 
-  if (message.type === 'success') {
-    toast.success(message.text);
-    return;
-  }
+const Toaster = ({ ...props }: ToasterProps) => {
+  const { theme = "system" } = useTheme()
 
-  toast(message.text);
-}
-
-export function AppToaster(props: ToasterProps) {
   return (
-    <SonnerToaster
-      theme="dark"
-      position="top-right"
-      closeButton
+    <Sonner
+      theme={theme as ToasterProps["theme"]}
+      className="toaster group"
+      icons={{
+        success: (
+          <HugeiconsIcon icon={CheckmarkCircle02Icon} strokeWidth={2} className="size-4" />
+        ),
+        info: (
+          <HugeiconsIcon icon={InformationCircleIcon} strokeWidth={2} className="size-4" />
+        ),
+        warning: (
+          <HugeiconsIcon icon={Alert02Icon} strokeWidth={2} className="size-4" />
+        ),
+        error: (
+          <HugeiconsIcon icon={MultiplicationSignCircleIcon} strokeWidth={2} className="size-4" />
+        ),
+        loading: (
+          <HugeiconsIcon icon={Loading03Icon} strokeWidth={2} className="size-4 animate-spin" />
+        ),
+      }}
+      style={
+        {
+          "--normal-bg": "var(--popover)",
+          "--normal-text": "var(--popover-foreground)",
+          "--normal-border": "var(--border)",
+          "--border-radius": "var(--radius)",
+        } as React.CSSProperties
+      }
       toastOptions={{
         classNames: {
-          toast: cn('border border-[var(--border)] bg-[var(--bg-light)] text-[var(--txt)] shadow-xl'),
-          title: cn('text-[var(--txt)] font-semibold'),
-          description: cn('text-[var(--txt-light)]'),
-          closeButton: cn('border-[var(--border)] bg-[var(--bg-light)] text-[var(--txt-light)] hover:text-[var(--txt)]'),
-          success: cn('border-[var(--safe)]/50'),
-          error: cn('border-[var(--danger)]/50'),
-          info: cn('border-[var(--border)]'),
-          actionButton: cn('bg-[var(--acc-p)] text-[var(--txt)]'),
-          cancelButton: cn('bg-[var(--acc-s)] text-[var(--txt)]')
-        }
+          toast: "cn-toast",
+        },
       }}
       {...props}
     />
-  );
+  )
 }
+
+export { Toaster }

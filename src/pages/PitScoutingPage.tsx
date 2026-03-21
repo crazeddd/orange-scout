@@ -1,10 +1,11 @@
 import { Pencil, Plus, Save, Trash2 } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Textarea } from '../components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { PitEntry, PitFormData } from '../model/types';
 import { parseNumberInput } from '../model/utils';
 
@@ -34,7 +35,7 @@ export function PitScoutingPage({
       <Card>
         <CardHeader>
           <CardTitle>{editingPitId ? 'Edit Pit Entry' : 'Pit Scouting'}</CardTitle>
-          <CardDescription>Capture robot capability details using the shared scout name from the sidebar.</CardDescription>
+          <CardDescription>Yeah.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -67,20 +68,16 @@ export function PitScoutingPage({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="pitRole">Expected Role</Label>
-              <Select
-                value={pitForm.expectedRole}
-                onValueChange={(value) => updatePitForm('expectedRole', value as PitFormData['expectedRole'])}
-              >
-                <SelectTrigger id="pitRole">
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="offense">Offense</SelectItem>
-                  <SelectItem value="defense">Defense</SelectItem>
-                  <SelectItem value="flex">Flex</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="pitFuelCapacity">Fuel Capacity</Label>
+              <Input
+                id="pitFuelCapacity"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={String(pitForm.fuelCapacity)}
+                onChange={(event) => updatePitForm('fuelCapacity', parseNumberInput(event.target.value, 0))}
+                placeholder="0"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="pitClimbCapability">Climb Capability</Label>
@@ -98,6 +95,29 @@ export function PitScoutingPage({
                   <SelectItem value="L3">L3</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="flex items-center justify-between rounded-lg border px-3 py-2">
+              <div>
+                <Label htmlFor="canGoUnderTrench">Can go under trench</Label>
+              </div>
+              <Switch
+                id="canGoUnderTrench"
+                checked={pitForm.canGoUnderTrench}
+                onCheckedChange={(checked) => updatePitForm('canGoUnderTrench', checked === true)}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-lg border px-3 py-2">
+              <div>
+                <Label htmlFor="canGoOverBump">Can go over bump</Label>
+              </div>
+              <Switch
+                id="canGoOverBump"
+                checked={pitForm.canGoOverBump}
+                onCheckedChange={(checked) => updatePitForm('canGoOverBump', checked === true)}
+              />
             </div>
           </div>
 

@@ -1,9 +1,11 @@
 import { CloudUpload, Pencil, Trash2 } from 'lucide-react';
-import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Badge } from "@/components/ui/badge"
 import { PitEntry, ScoutEntry } from '../model/types';
+
 
 type EntriesPageProps = {
   entries: ScoutEntry[];
@@ -36,7 +38,7 @@ export function EntriesPage({
         <CardHeader>
           <CardTitle>Upload & Sync</CardTitle>
           <CardDescription>
-            Pending: {pendingCount} / Total: {entries.length}
+            Pending: {pendingCount} / Total: {entries.length + pitEntries.length}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -64,11 +66,16 @@ export function EntriesPage({
                 <article key={entry.id} className="rounded-lg border border-[var(--border)] bg-[var(--bg-light)] p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
+                      <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-base font-semibold text-[var(--txt)]">
-                        Match {entry.matchNumber} • Team {entry.teamNumber}
+                        Match {entry.matchNumber}
                       </h3>
-                      <p className="text-xs text-[var(--txt-dark)]">
-                        Status: {entry.uploadedAt ? 'Uploaded' : 'Pending'} • Saved {new Date(entry.createdAt).toLocaleString()}
+                      <Badge variant={entry.uploadedAt ? "default" : "outline"}>
+                        {entry.uploadedAt ? "Uploaded" : "Pending Upload"}
+                      </Badge>
+                </div>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(entry.createdAt).toLocaleString()}
                       </p>
                     </div>
                     <div className="flex gap-2">
@@ -98,11 +105,16 @@ export function EntriesPage({
           ) : (
             <div className="space-y-3">
               {pitEntries.map((entry) => (
-                <article key={entry.id} className="rounded-lg border border-[var(--border)] bg-[var(--bg-light)] p-4">
+                <article key={entry.id} className="rounded-lg border p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <h3 className="text-base font-semibold text-[var(--txt)]">Team {entry.teamNumber}</h3>
-                      <p className="text-xs text-[var(--txt-dark)]">Saved {new Date(entry.createdAt).toLocaleString()}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-base font-semibold">Team {entry.teamNumber}</h3>
+                      <Badge variant="outline">{entry.uploadedAt ? "Uploaded" : "Pending Upload"}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(entry.createdAt).toLocaleString()}
+                      </p>
                     </div>
                     <div className="flex gap-2">
                       <Button variant="secondary" size="sm" onClick={() => onEditPitEntry(entry)} className="gap-1">

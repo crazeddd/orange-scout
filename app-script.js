@@ -23,12 +23,11 @@ function doPost(e) {
         entry.teamNumber || "",
         entry.startingPosition || "",
         entry.alliance || "",
-        entry.autonPoints || 0,
         entry.autonClimbLevel || "",
-        entry.teleopPoints || 0,
         entry.teleopClimbLevel || "",
         entry.playedDefense ? "Yes" : "No",
-        entry.accuracyPercentage || "",
+        entry.teamPointsPercentage || 0,
+        entry.accuracyPercentage || 0,
         entry.notes || "",
         entry.createdAt || ""
       ];
