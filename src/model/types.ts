@@ -1,7 +1,7 @@
-export type Position = 'trench' | 'hub' | 'bump' | 'fender' | 'other';
+export type Position = 'hub' | 'trench (left)' | 'trench (right)' | 'bump (left)' | 'bump (right)';
 export type Alliance = 'red' | 'blue';
 export type ClimbLevel = 'L1' | 'L2' | 'L3' | 'none' | 'failed';
-export type Drivetrain = 'swerve' | 'tank' | 'mecanum' | 'other';
+export type Drivetrain = 'swerve' | 'tank' | 'other';
 
 export type ActivePage = 'entry' | 'entries' | 'pit';
 
@@ -22,8 +22,13 @@ export type ScoutEntry = {
   autonClimbLevel: ClimbLevel;
   teleopClimbLevel: ClimbLevel;
   playedDefense: boolean;
-  teamPointsPercentage: number;
-  accuracyPercentage: number;
+  disconnected: boolean;
+  noShow: boolean;
+  estimatedAutoFuelScored: number;
+  estimatedTeleopFuelScored: number;
+  passedFuel: boolean;
+  passedFuelAmount: number;
+  usedCorral: boolean;
   notes: string;
 };
 
@@ -36,6 +41,7 @@ export type PitEntry = {
   scoutName: string;
   teamNumber: number;
   drivetrain: Drivetrain;
+  gearRatio: string;
   fuelCapacity: number;
   autonomousSummary: string;
   teleopSummary: string;

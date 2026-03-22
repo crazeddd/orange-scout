@@ -5,7 +5,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { ScoutFormData } from '../model/types';
 import { parseNumberInput } from '../model/utils';
@@ -66,10 +65,10 @@ export function ScoutingPage({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="hub">Hub</SelectItem>
-                <SelectItem value="trench">Trench (left)</SelectItem>
-                <SelectItem value="fender">Trench (right)</SelectItem>
-                <SelectItem value="bump">Bump (left)</SelectItem>
-                <SelectItem value="other">Bump (right)</SelectItem>
+                <SelectItem value="trench (left)">Trench (left)</SelectItem>
+                <SelectItem value="trench (right)">Trench (right)</SelectItem>
+                <SelectItem value="bump (left)">Bump (left)</SelectItem>
+                <SelectItem value="bump (right)">Bump (right)</SelectItem>
 
               </SelectContent>
             </Select>
@@ -89,12 +88,44 @@ export function ScoutingPage({
               </SelectContent>
             </Select>
           </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="disconnected"
+              checked={form.disconnected}
+              onCheckedChange={(checked) => updateForm('disconnected', checked === true)}
+            />
+            <Label htmlFor="disconnected" className="text-sm">
+              Disconnected?
+            </Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="noShow"
+              checked={form.noShow}
+              onCheckedChange={(checked) => updateForm('noShow', checked === true)}
+            />
+            <Label htmlFor="noShow" className="text-sm">
+              No Show?
+            </Label>
+          </div>
         </div>
 
         <div className="grid gap-3 md:grid-cols-2">
-          <fieldset className="rounded-lg border border-[var(--border)] p-4">
-            <legend className="px-1 text-sm font-semibold text-[var(--txt)]">Auton</legend>
+          <fieldset className="rounded-lg border p-4">
+            <legend className="px-1 text-sm font-semibold">Auton</legend>
             <div className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="estimatedAutoFuelScored">Estimated Auto Fuel Scored</Label>
+                <Input
+                  id="estimatedAutoFuelScored"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={String(form.estimatedAutoFuelScored)}
+                  onChange={(event) => updateForm('estimatedAutoFuelScored', parseNumberInput(event.target.value, 0))}
+                  placeholder="0"
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="autonClimbLevel">Climb Level</Label>
                 <Select
@@ -111,12 +142,25 @@ export function ScoutingPage({
                   </SelectContent>
                 </Select>
               </div>
+
             </div>
           </fieldset>
 
           <fieldset className="rounded-lg border border-[var(--border)] p-4">
-            <legend className="px-1 text-sm font-semibold text-[var(--txt)]">Teleop</legend>
+            <legend className="px-1 text-sm font-semibold">Teleop</legend>
             <div className="space-y-3">
+              <div className="space-y-2">
+                <Label htmlFor="estimatedTeleopFuelScored">Estimated Teleop Fuel Scored</Label>
+                <Input
+                  id="estimatedTeleopFuelScored"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={String(form.estimatedTeleopFuelScored)}
+                  onChange={(event) => updateForm('estimatedTeleopFuelScored', parseNumberInput(event.target.value, 0))}
+                  placeholder="0"
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="teleopClimbLevel">Climb Level</Label>
                 <Select
@@ -135,13 +179,46 @@ export function ScoutingPage({
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="passedFuel"
+                    checked={form.passedFuel}
+                    onCheckedChange={(checked) => {
+                      const enabled = checked === true;
+                      updateForm('passedFuel', enabled);
+                      if (!enabled) {
+                        updateForm('passedFuelAmount', 0);
+                      }
+                    }}
+                  />
+                  <Label htmlFor="passedFuel" className="text-sm text-muted-foreground">
+                    Passed Fuel?
+                  </Label>
+                </div>
+              </div>
+              {form.passedFuel && (
+                <div className="space-y-2">
+                  <Label htmlFor="passedFuelAmount">Amount Passed</Label>
+                  <Input
+                    id="passedFuelAmount"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={String(form.passedFuelAmount)}
+                    onChange={(event) => updateForm('passedFuelAmount', parseNumberInput(event.target.value, 0))}
+                    placeholder="0"
+                  />
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Checkbox
                   id="playedDefense"
                   checked={form.playedDefense}
                   onCheckedChange={(checked) => updateForm('playedDefense', checked === true)}
                 />
-                <Label htmlFor="playedDefense" className="text-sm text-[var(--txt-light)]">
+                <Label htmlFor="playedDefense" className="text-sm text-muted-foreground">
                   Played Defense?
                 </Label>
               </div>
@@ -150,34 +227,18 @@ export function ScoutingPage({
         </div>
 
         <fieldset className="rounded-lg border border-[var(--border)] p-4">
-          <legend className="px-1 text-sm font-semibold text-[var(--txt)]">Overall</legend>
+          <legend className="px-1 text-sm font-semibold">Overall</legend>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="teamPointsPercentage">% of Team Points Scored</Label>
-              <div className="space-y-2">
-                <Slider
-                  id="teamPointsPercentage"
-                  min={0}
-                  max={100}
-                  step={5}
-                  value={[form.teamPointsPercentage]}
-                  onValueChange={(value) => updateForm('teamPointsPercentage', value[0] ?? 0)}
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="usedCorral"
+                  checked={form.usedCorral}
+                  onCheckedChange={(checked) => updateForm('usedCorral', checked === true)}
                 />
-                <div className="text-xs text-[var(--txt-light)]">{form.teamPointsPercentage}%</div>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="accuracyPercentage">Accuracy Percentage</Label>
-              <div className="space-y-2">
-                <Slider
-                  id="accuracyPercentage"
-                  min={0}
-                  max={100}
-                  step={5}
-                  value={[form.accuracyPercentage]}
-                  onValueChange={(value) => updateForm('accuracyPercentage', value[0] ?? 0)}
-                />
-                <div className="text-xs text-[var(--txt-light)]">{form.accuracyPercentage}%</div>
+                <Label htmlFor="usedCorral" className="text-sm text-muted-foreground">
+                  Used Corral?
+                </Label>
               </div>
             </div>
             <div className="space-y-2 sm:col-span-2">

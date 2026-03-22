@@ -62,7 +62,6 @@ export function PitScoutingPage({
                 <SelectContent>
                   <SelectItem value="swerve">Swerve</SelectItem>
                   <SelectItem value="tank">Tank</SelectItem>
-                  <SelectItem value="mecanum">Mecanum</SelectItem>
                   <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
@@ -77,6 +76,16 @@ export function PitScoutingPage({
                 value={String(pitForm.fuelCapacity)}
                 onChange={(event) => updatePitForm('fuelCapacity', parseNumberInput(event.target.value, 0))}
                 placeholder="0"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pitGearRatio">Gear Ratio</Label>
+              <Input
+                id="pitGearRatio"
+                type="text"
+                value={pitForm.gearRatio}
+                onChange={(event) => updatePitForm('gearRatio', event.target.value)}
+                placeholder="e.g. 6:1"
               />
             </div>
             <div className="space-y-2">

@@ -180,8 +180,13 @@ function App() {
       autonClimbLevel: entry.autonClimbLevel,
       teleopClimbLevel: entry.teleopClimbLevel,
       playedDefense: entry.playedDefense,
-      teamPointsPercentage: entry.teamPointsPercentage ?? 0,
-      accuracyPercentage: entry.accuracyPercentage ?? 0,
+      disconnected: entry.disconnected ?? false,
+      noShow: entry.noShow ?? false,
+      estimatedAutoFuelScored: entry.estimatedAutoFuelScored ?? 0,
+      estimatedTeleopFuelScored: entry.estimatedTeleopFuelScored ?? 0,
+      passedFuel: entry.passedFuel ?? false,
+      passedFuelAmount: entry.passedFuelAmount ?? 0,
+      usedCorral: entry.usedCorral ?? false,
       notes: entry.notes
     });
     setStatusMessage({ type: 'info', text: 'Editing selected entry.' });
@@ -235,6 +240,7 @@ function App() {
       scoutName,
       teamNumber: entry.teamNumber,
       drivetrain: entry.drivetrain,
+      gearRatio: entry.gearRatio ?? '',
       fuelCapacity: entry.fuelCapacity ?? 0,
       autonomousSummary: entry.autonomousSummary,
       teleopSummary: entry.teleopSummary,
@@ -252,6 +258,14 @@ function App() {
       resetPitForm();
     }
     setPitStatusMessage({ type: 'info', text: 'Pit entry deleted.' });
+  };
+
+  const deleteAllEntries = () => {
+    setEntries([]);
+    setPitEntries([]);
+    resetForm(scoutName);
+    resetPitForm();
+    setStatusMessage({ type: 'info', text: 'All saved entries deleted.' });
   };
 
   const handleUploadPending = async () => {
@@ -275,12 +289,11 @@ function App() {
         pendingPitEntries
       });
 
-      const uploadedAt = new Date().toISOString();
-      setEntries((prev) => prev.map((entry) => (entry.uploadedAt ? entry : { ...entry, uploadedAt })));
-      setPitEntries((prev) => prev.map((entry) => (entry.uploadedAt ? entry : { ...entry, uploadedAt })));
+      setEntries((prev) => prev.filter((entry) => entry.uploadedAt));
+      setPitEntries((prev) => prev.filter((entry) => entry.uploadedAt));
       setStatusMessage({
         type: 'success',
-        text: `Uploaded ${totalPendingCount} entr${totalPendingCount === 1 ? 'y' : 'ies'} successfully.`
+        text: `Uploaded and removed ${totalPendingCount} entr${totalPendingCount === 1 ? 'y' : 'ies'}.`
       });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Upload failed.';
@@ -291,7 +304,7 @@ function App() {
   };
 
   return (
-    <main className="min-h-svh bg-app-bg text-[var(--txt)]">
+    <main className="min-h-svh bg-app-bg text-foreground">
       <SidebarProvider>
         <SidebarNav
           activePage={activePage}
@@ -330,6 +343,7 @@ function App() {
                 onDeleteEntry={deleteEntry}
                 onEditPitEntry={editPitEntry}
                 onDeletePitEntry={deletePitEntry}
+                onDeleteAllEntries={deleteAllEntries}
               />
             ) : (
               <PitScoutingPage

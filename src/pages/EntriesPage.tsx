@@ -18,6 +18,7 @@ type EntriesPageProps = {
   onDeleteEntry: (id: string) => void;
   onEditPitEntry: (entry: PitEntry) => void;
   onDeletePitEntry: (id: string) => void;
+  onDeleteAllEntries: () => void;
 };
 
 export function EntriesPage({
@@ -30,7 +31,8 @@ export function EntriesPage({
   onEditEntry,
   onDeleteEntry,
   onEditPitEntry,
-  onDeletePitEntry
+  onDeletePitEntry,
+  onDeleteAllEntries
 }: EntriesPageProps) {
   return (
     <>
@@ -59,7 +61,7 @@ export function EntriesPage({
         </CardHeader>
         <CardContent>
           {entries.length === 0 ? (
-            <p className="text-sm text-[var(--txt-light)]">No entries saved yet.</p>
+            <p className="text-sm text-muted-foreground">No entries saved yet.</p>
           ) : (
             <div className="space-y-3">
               {entries.map((entry) => (
@@ -67,7 +69,7 @@ export function EntriesPage({
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="text-base font-semibold text-[var(--txt)]">
+                      <h3 className="text-base font-semibold">
                         Match {entry.matchNumber}
                       </h3>
                       <Badge variant={entry.uploadedAt ? "default" : "outline"}>
@@ -97,20 +99,20 @@ export function EntriesPage({
       <Card>
         <CardHeader>
           <CardTitle>Saved Pit Entries</CardTitle>
-          <CardDescription>Pit scouting records are also available here for quick edits and cleanup.</CardDescription>
+          <CardDescription>View, edit, or delete before uploading.</CardDescription>
         </CardHeader>
         <CardContent>
           {pitEntries.length === 0 ? (
-            <p className="text-sm text-[var(--txt-light)]">No pit entries saved yet.</p>
+            <p className="text-sm text-muted-foreground">No pit entries saved yet.</p>
           ) : (
             <div className="space-y-3">
               {pitEntries.map((entry) => (
-                <article key={entry.id} className="rounded-lg border p-4">
+                <article key={entry.id} className="rounded-lg border border-[var(--border)] bg-[var(--bg-light)] p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
                       <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-base font-semibold">Team {entry.teamNumber}</h3>
-                      <Badge variant="outline">{entry.uploadedAt ? "Uploaded" : "Pending Upload"}</Badge>
+                      <Badge variant={entry.uploadedAt ? "default" : "outline"}>{entry.uploadedAt ? "Uploaded" : "Pending Upload"}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground">
                         {new Date(entry.createdAt).toLocaleString()}
@@ -129,6 +131,23 @@ export function EntriesPage({
               ))}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Manage Data</CardTitle>
+          <CardDescription>Permanent actions for saved local data.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button
+            variant="destructive"
+            onClick={onDeleteAllEntries}
+            disabled={entries.length + pitEntries.length === 0}
+            className="w-full gap-2"
+          >
+            <Trash2 size={16} /> Delete All Saved Entries
+          </Button>
         </CardContent>
       </Card>
     </>

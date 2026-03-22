@@ -38,8 +38,13 @@ export const uploadEntries = async ({
     autonClimbLevel: entry.autonClimbLevel,
     teleopClimbLevel: entry.teleopClimbLevel,
     playedDefense: entry.playedDefense,
-    teamPointsPercentage: entry.teamPointsPercentage ?? 0,
-    accuracyPercentage: entry.accuracyPercentage ?? 0,
+    disconnected: entry.disconnected ?? false,
+    noShow: entry.noShow ?? false,
+    estimatedAutoFuelScored: entry.estimatedAutoFuelScored ?? 0,
+    estimatedTeleopFuelScored: entry.estimatedTeleopFuelScored ?? 0,
+    passedFuel: entry.passedFuel ?? false,
+    passedFuelAmount: entry.passedFuelAmount ?? 0,
+    usedCorral: entry.usedCorral ?? false,
     notes: entry.notes,
     createdAt: entry.createdAt
   }));
@@ -49,6 +54,7 @@ export const uploadEntries = async ({
     scoutName: entry.scoutName,
     teamNumber: entry.teamNumber,
     drivetrain: entry.drivetrain,
+    gearRatio: entry.gearRatio ?? '',
     fuelCapacity: entry.fuelCapacity ?? 0,
     autonomousSummary: entry.autonomousSummary,
     teleopSummary: entry.teleopSummary,

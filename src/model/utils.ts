@@ -1,4 +1,4 @@
-import { PitEntry, PitFormData, ScoutEntry, ScoutFormData } from './types';
+import { PitEntry, PitFormData, Position, ScoutEntry, ScoutFormData } from './types';
 
 export const LOCAL_STORAGE_KEY = 'scout-entries-v1';
 export const PIT_STORAGE_KEY = 'pit-entries-v1';
@@ -8,13 +8,18 @@ export const emptyForm = (scoutName: string): ScoutFormData => ({
   scoutName,
   matchNumber: 1,
   teamNumber: 0,
-  startingPosition: 'trench',
+  startingPosition: 'trench (left)',
   alliance: 'red',
   autonClimbLevel: 'none',
   teleopClimbLevel: 'none',
   playedDefense: false,
-  teamPointsPercentage: 0,
-  accuracyPercentage: 0,
+  disconnected: false,
+  noShow: false,
+  estimatedAutoFuelScored: 0,
+  estimatedTeleopFuelScored: 0,
+  passedFuel: false,
+  passedFuelAmount: 0,
+  usedCorral: false,
   notes: ''
 });
 
@@ -25,10 +30,25 @@ export const parseStoredEntries = (): ScoutEntry[] => {
   try {
     const parsed = JSON.parse(raw) as ScoutEntry[];
     if (!Array.isArray(parsed)) return [];
+    const normalizeStartingPosition = (position: unknown): Position => {
+      if (position === 'hub') return 'hub';
+      if (position === 'trench' || position === 'trench (left)') return 'trench (left)';
+      if (position === 'fender' || position === 'trench (right)') return 'trench (right)';
+      if (position === 'bump' || position === 'bump (left)') return 'bump (left)';
+      if (position === 'other' || position === 'bump (right)') return 'bump (right)';
+      return 'trench (left)';
+    };
+
     return parsed.map((entry) => ({
       ...entry,
-      teamPointsPercentage: typeof entry.teamPointsPercentage === 'number' ? entry.teamPointsPercentage : 0,
-      accuracyPercentage: typeof entry.accuracyPercentage === 'number' ? entry.accuracyPercentage : 0
+      startingPosition: normalizeStartingPosition(entry.startingPosition),
+      disconnected: typeof entry.disconnected === 'boolean' ? entry.disconnected : false,
+      noShow: typeof entry.noShow === 'boolean' ? entry.noShow : false,
+      estimatedAutoFuelScored: typeof entry.estimatedAutoFuelScored === 'number' ? entry.estimatedAutoFuelScored : 0,
+      estimatedTeleopFuelScored: typeof entry.estimatedTeleopFuelScored === 'number' ? entry.estimatedTeleopFuelScored : 0,
+      passedFuel: typeof entry.passedFuel === 'boolean' ? entry.passedFuel : false,
+      passedFuelAmount: typeof entry.passedFuelAmount === 'number' ? entry.passedFuelAmount : 0,
+      usedCorral: typeof entry.usedCorral === 'boolean' ? entry.usedCorral : false
     }));
   } catch {
     return [];
@@ -54,6 +74,7 @@ export const emptyPitForm = (scoutName = ''): PitFormData => ({
   scoutName,
   teamNumber: 0,
   drivetrain: 'swerve',
+  gearRatio: '',
   fuelCapacity: 0,
   autonomousSummary: '',
   teleopSummary: '',
@@ -72,6 +93,7 @@ export const parseStoredPitEntries = (): PitEntry[] => {
     if (!Array.isArray(parsed)) return [];
     return parsed.map((entry) => ({
       ...entry,
+      gearRatio: typeof entry.gearRatio === 'string' ? entry.gearRatio : '',
       fuelCapacity: typeof entry.fuelCapacity === 'number' ? entry.fuelCapacity : 0,
       canGoUnderTrench: typeof entry.canGoUnderTrench === 'boolean' ? entry.canGoUnderTrench : false,
       canGoOverBump: typeof entry.canGoOverBump === 'boolean' ? entry.canGoOverBump : false
