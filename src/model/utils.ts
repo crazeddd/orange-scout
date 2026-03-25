@@ -6,7 +6,7 @@ export const SCOUT_NAME_KEY = 'scout-name-v1';
 
 export const emptyForm = (scoutName: string): ScoutFormData => ({
   scoutName,
-  matchNumber: 1,
+  matchNumber: 0,
   teamNumber: 0,
   startingPosition: 'trench (left)',
   alliance: 'red',
