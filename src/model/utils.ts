@@ -17,6 +17,7 @@ export const emptyForm = (scoutName: string): ScoutFormData => ({
   noShow: false,
   estimatedAutoFuelScored: 0,
   estimatedTeleopFuelScored: 0,
+  shootingAccuracy: 0,
   passedFuel: false,
   passedFuelAmount: 0,
   usedCorral: false,
@@ -46,6 +47,7 @@ export const parseStoredEntries = (): ScoutEntry[] => {
       noShow: typeof entry.noShow === 'boolean' ? entry.noShow : false,
       estimatedAutoFuelScored: typeof entry.estimatedAutoFuelScored === 'number' ? entry.estimatedAutoFuelScored : 0,
       estimatedTeleopFuelScored: typeof entry.estimatedTeleopFuelScored === 'number' ? entry.estimatedTeleopFuelScored : 0,
+      shootingAccuracy: typeof entry.shootingAccuracy === 'number' ? entry.shootingAccuracy : 0,
       passedFuel: typeof entry.passedFuel === 'boolean' ? entry.passedFuel : false,
       passedFuelAmount: typeof entry.passedFuelAmount === 'number' ? entry.passedFuelAmount : 0,
       usedCorral: typeof entry.usedCorral === 'boolean' ? entry.usedCorral : false

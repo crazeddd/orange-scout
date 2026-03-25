@@ -42,6 +42,7 @@ export const uploadEntries = async ({
     noShow: entry.noShow ?? false,
     estimatedAutoFuelScored: entry.estimatedAutoFuelScored ?? 0,
     estimatedTeleopFuelScored: entry.estimatedTeleopFuelScored ?? 0,
+    shootingAccuracy: entry.shootingAccuracy ?? 0,
     passedFuel: entry.passedFuel ?? false,
     passedFuelAmount: entry.passedFuelAmount ?? 0,
     usedCorral: entry.usedCorral ?? false,

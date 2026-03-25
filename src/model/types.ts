@@ -26,6 +26,7 @@ export type ScoutEntry = {
   noShow: boolean;
   estimatedAutoFuelScored: number;
   estimatedTeleopFuelScored: number;
+  shootingAccuracy: number;
   passedFuel: boolean;
   passedFuelAmount: number;
   usedCorral: boolean;

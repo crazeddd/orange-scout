@@ -15,6 +15,7 @@ var RAW_HEADERS = [
   "No Show",
   "Estimated Auto Fuel Scored",
   "Estimated Teleop Fuel Scored",
+  "Shooting Accuracy",
   "Passed Fuel",
   "Passed Fuel Amount",
   "Used Corral",
@@ -30,12 +31,44 @@ var RAW_HEADERS = [
   "Created At"
 ];
 
+function buildHeaderMap(headers) {
+  var map = {};
+  for (var i = 0; i < headers.length; i++) {
+    map[headers[i]] = i;
+  }
+  return map;
+}
+
+var RAW_HEADER_INDEX = buildHeaderMap(RAW_HEADERS);
+
+function createRawRow() {
+  var row = [];
+  for (var i = 0; i < RAW_HEADERS.length; i++) {
+    row.push("");
+  }
+  return row;
+}
+
+function setRawValue(row, header, value) {
+  var index = RAW_HEADER_INDEX[header];
+  if (typeof index === "number") {
+    row[index] = value;
+  }
+}
+
+function getRawValue(row, header) {
+  var index = RAW_HEADER_INDEX[header];
+  if (typeof index !== "number") return "";
+  return row[index];
+}
+
 var MASTER_HEADERS = [
   "Team",
   "Scout Entries",
   "Avg Auto Fuel",
   "Avg Teleop Fuel",
   "Avg Total Fuel",
+  "Avg Shooting Accuracy %",
   "Teleop Climb Success %",
   "Auton Climb Success %",
   "Defense %",
@@ -51,6 +84,7 @@ var MASTER_SORT_OPTIONS = [
   "Avg Total Fuel",
   "Avg Auto Fuel",
   "Avg Teleop Fuel",
+  "Avg Shooting Accuracy %",
   "Teleop Climb Success %",
   "Auton Climb Success %",
   "Defense %",
@@ -134,6 +168,7 @@ function deriveTeamStats(teamNumber, pitEntries, scoutEntries) {
   var scoutCount = scoutEntries.length;
   var autoFuelTotal = 0;
   var teleFuelTotal = 0;
+  var shootingAccuracyTotal = 0;
   var passedFuelCount = 0;
   var passedFuelAmountTotal = 0;
   var defenseCount = 0;
@@ -146,6 +181,7 @@ function deriveTeamStats(teamNumber, pitEntries, scoutEntries) {
     var entry = scoutEntries[i];
     autoFuelTotal += toNumber(entry.estimatedAutoFuelScored);
     teleFuelTotal += toNumber(entry.estimatedTeleopFuelScored);
+    shootingAccuracyTotal += toNumber(entry.shootingAccuracy);
     if (toBool(entry.passedFuel)) {
       passedFuelCount += 1;
       passedFuelAmountTotal += toNumber(entry.passedFuelAmount);
@@ -165,6 +201,7 @@ function deriveTeamStats(teamNumber, pitEntries, scoutEntries) {
     avgAutoFuel: scoutCount ? autoFuelTotal / scoutCount : 0,
     avgTeleFuel: scoutCount ? teleFuelTotal / scoutCount : 0,
     avgTotalFuel: scoutCount ? (autoFuelTotal + teleFuelTotal) / scoutCount : 0,
+    avgShootingAccuracy: scoutCount ? shootingAccuracyTotal / scoutCount : 0,
     teleClimbSuccessRate: scoutCount ? (teleClimbSuccessCount / scoutCount) : 0,
     autonClimbSuccessRate: scoutCount ? (autonClimbSuccessCount / scoutCount) : 0,
     defenseRate: scoutCount ? (defenseCount / scoutCount) : 0,
@@ -210,6 +247,7 @@ function buildTeamRows(teamNumber, pitEntries, scoutEntries) {
   rows.push(["Average Auto Fuel", stats.avgAutoFuel.toFixed(2)]);
   rows.push(["Average Teleop Fuel", stats.avgTeleFuel.toFixed(2)]);
   rows.push(["Average Total Fuel", stats.avgTotalFuel.toFixed(2)]);
+  rows.push(["Average Shooting Accuracy", stats.avgShootingAccuracy.toFixed(1) + "%"]);
   rows.push(["Teleop Climb Success Rate", asPercent(stats.teleClimbSuccessRate, 1)]);
   rows.push(["Auton Climb Success Rate", asPercent(stats.autonClimbSuccessRate, 1)]);
   rows.push(["Played Defense Rate", asPercent(stats.defenseRate, 1)]);
@@ -228,6 +266,7 @@ function buildTeamRows(teamNumber, pitEntries, scoutEntries) {
     "Starting Position",
     "Auto Fuel",
     "Teleop Fuel",
+    "Shooting Accuracy",
     "Auton Climb",
     "Teleop Climb",
     "Passed Fuel",
@@ -257,6 +296,7 @@ function buildTeamRows(teamNumber, pitEntries, scoutEntries) {
       formatStartingPosition(scout.startingPosition),
       toNumber(scout.estimatedAutoFuelScored),
       toNumber(scout.estimatedTeleopFuelScored),
+      toNumber(scout.shootingAccuracy),
       scout.autonClimbLevel || "",
       scout.teleopClimbLevel || "",
       toBool(scout.passedFuel) ? "Yes" : "No",
@@ -277,6 +317,11 @@ function writeTeamSheet(teamSheet, rows) {
   teamSheet.clearFormats();
 
   var width = 16;
+  for (var i = 0; i < rows.length; i++) {
+    if (rows[i].length > width) {
+      width = rows[i].length;
+    }
+  }
   var paddedRows = rows.map(function(row) {
     var copy = row.slice();
     while (copy.length < width) copy.push("");
@@ -298,40 +343,41 @@ function readRawBuckets(rawSheet) {
 
   for (var r = 0; r < values.length; r++) {
     var row = values[r];
-    var teamNumber = toNumber(row[4]);
+    var teamNumber = toNumber(getRawValue(row, "Team Number"));
     if (teamNumber <= 0) continue;
     if (!buckets[teamNumber]) {
       buckets[teamNumber] = { pitEntries: [], scoutEntries: [] };
     }
 
     var item = {
-      receivedAt: row[0],
-      scoutName: row[1],
-      type: row[2],
-      matchNumber: row[3],
-      teamNumber: row[4],
-      startingPosition: row[5],
-      alliance: row[6],
-      autonClimbLevel: row[7],
-      teleopClimbLevel: row[8],
-      playedDefense: row[9],
-      disconnected: row[10],
-      noShow: row[11],
-      estimatedAutoFuelScored: row[12],
-      estimatedTeleopFuelScored: row[13],
-      passedFuel: row[14],
-      passedFuelAmount: row[15],
-      usedCorral: row[16],
-      drivetrain: row[17],
-      gearRatio: row[18],
-      fuelCapacity: row[19],
-      autonomousSummary: row[20],
-      teleopSummary: row[21],
-      climbCapability: row[22],
-      canGoUnderTrench: row[23],
-      canGoOverBump: row[24],
-      notes: row[25],
-      createdAt: row[26]
+      receivedAt: getRawValue(row, "Received At"),
+      scoutName: getRawValue(row, "Scout Name"),
+      type: getRawValue(row, "Entry Type"),
+      matchNumber: getRawValue(row, "Match Number"),
+      teamNumber: getRawValue(row, "Team Number"),
+      startingPosition: getRawValue(row, "Starting Position"),
+      alliance: getRawValue(row, "Alliance"),
+      autonClimbLevel: getRawValue(row, "Auton Climb Level"),
+      teleopClimbLevel: getRawValue(row, "Teleop Climb Level"),
+      playedDefense: getRawValue(row, "Played Defense"),
+      disconnected: getRawValue(row, "Disconnected"),
+      noShow: getRawValue(row, "No Show"),
+      estimatedAutoFuelScored: getRawValue(row, "Estimated Auto Fuel Scored"),
+      estimatedTeleopFuelScored: getRawValue(row, "Estimated Teleop Fuel Scored"),
+      shootingAccuracy: getRawValue(row, "Shooting Accuracy"),
+      passedFuel: getRawValue(row, "Passed Fuel"),
+      passedFuelAmount: getRawValue(row, "Passed Fuel Amount"),
+      usedCorral: getRawValue(row, "Used Corral"),
+      drivetrain: getRawValue(row, "Drivetrain"),
+      gearRatio: getRawValue(row, "Gear Ratio"),
+      fuelCapacity: getRawValue(row, "Fuel Capacity"),
+      autonomousSummary: getRawValue(row, "Autonomous Summary"),
+      teleopSummary: getRawValue(row, "Teleop Summary"),
+      climbCapability: getRawValue(row, "Pit Climb Capability"),
+      canGoUnderTrench: getRawValue(row, "Can Go Under Trench"),
+      canGoOverBump: getRawValue(row, "Can Go Over Bump"),
+      notes: getRawValue(row, "Notes"),
+      createdAt: getRawValue(row, "Created At")
     };
 
     if (item.type === "pit") {
@@ -409,6 +455,7 @@ function buildMasterSheet(ss, buckets) {
       Number(stats.avgAutoFuel.toFixed(2)),
       Number(stats.avgTeleFuel.toFixed(2)),
       Number(stats.avgTotalFuel.toFixed(2)),
+      Number(stats.avgShootingAccuracy.toFixed(1)),
       Number((stats.teleClimbSuccessRate * 100).toFixed(1)),
       Number((stats.autonClimbSuccessRate * 100).toFixed(1)),
       Number((stats.defenseRate * 100).toFixed(1)),
@@ -457,8 +504,8 @@ function replacePitRows(rawSheet, latestPitByTeam) {
     var values = rawSheet.getRange(2, 1, lastRow - 1, RAW_HEADERS.length).getValues();
     for (var idx = values.length - 1; idx >= 0; idx--) {
       var row = values[idx];
-      var isPit = row[2] === "pit";
-      var teamNumber = toNumber(row[4]);
+      var isPit = getRawValue(row, "Entry Type") === "pit";
+      var teamNumber = toNumber(getRawValue(row, "Team Number"));
       if (isPit && teamMap[teamNumber]) {
         rawSheet.deleteRow(idx + 2);
       }
@@ -469,35 +516,22 @@ function replacePitRows(rawSheet, latestPitByTeam) {
   for (var t = 0; t < teamKeys.length; t++) {
     var teamNumberKey = teamKeys[t];
     var pit = latestPitByTeam[teamNumberKey];
-    pitRows.push([
-      new Date(),
-      pit.scoutName || "",
-      "pit",
-      "",
-      toNumber(pit.teamNumber),
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      pit.drivetrain || "",
-      pit.gearRatio || "",
-      toNumber(pit.fuelCapacity),
-      pit.autonomousSummary || "",
-      pit.teleopSummary || "",
-      pit.climbCapability || "",
-      pit.canGoUnderTrench ? "Yes" : "No",
-      pit.canGoOverBump ? "Yes" : "No",
-      pit.notes || "",
-      pit.createdAt || ""
-    ]);
+    var pitRow = createRawRow();
+    setRawValue(pitRow, "Received At", new Date());
+    setRawValue(pitRow, "Scout Name", pit.scoutName || "");
+    setRawValue(pitRow, "Entry Type", "pit");
+    setRawValue(pitRow, "Team Number", toNumber(pit.teamNumber));
+    setRawValue(pitRow, "Drivetrain", pit.drivetrain || "");
+    setRawValue(pitRow, "Gear Ratio", pit.gearRatio || "");
+    setRawValue(pitRow, "Fuel Capacity", toNumber(pit.fuelCapacity));
+    setRawValue(pitRow, "Autonomous Summary", pit.autonomousSummary || "");
+    setRawValue(pitRow, "Teleop Summary", pit.teleopSummary || "");
+    setRawValue(pitRow, "Pit Climb Capability", pit.climbCapability || "");
+    setRawValue(pitRow, "Can Go Under Trench", pit.canGoUnderTrench ? "Yes" : "No");
+    setRawValue(pitRow, "Can Go Over Bump", pit.canGoOverBump ? "Yes" : "No");
+    setRawValue(pitRow, "Notes", pit.notes || "");
+    setRawValue(pitRow, "Created At", pit.createdAt || "");
+    pitRows.push(pitRow);
   }
 
   if (pitRows.length > 0) {
@@ -513,35 +547,28 @@ function appendScoutRows(rawSheet, scoutEntries, fallbackScoutName) {
     var entry = scoutEntries[i];
     var teamNumber = toNumber(entry.teamNumber);
     if (teamNumber <= 0) continue;
-    rowsToAppend.push([
-      new Date(),
-      entry.scoutName || fallbackScoutName || "",
-      "scout",
-      toNumber(entry.matchNumber),
-      teamNumber,
-      formatStartingPosition(entry.startingPosition),
-      entry.alliance || "",
-      entry.autonClimbLevel || "",
-      entry.teleopClimbLevel || "",
-      entry.playedDefense ? "Yes" : "No",
-      entry.disconnected ? "Yes" : "No",
-      entry.noShow ? "Yes" : "No",
-      toNumber(entry.estimatedAutoFuelScored),
-      toNumber(entry.estimatedTeleopFuelScored),
-      entry.passedFuel ? "Yes" : "No",
-      toNumber(entry.passedFuelAmount),
-      entry.usedCorral ? "Yes" : "No",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      entry.notes || "",
-      entry.createdAt || ""
-    ]);
+    var scoutRow = createRawRow();
+    setRawValue(scoutRow, "Received At", new Date());
+    setRawValue(scoutRow, "Scout Name", entry.scoutName || fallbackScoutName || "");
+    setRawValue(scoutRow, "Entry Type", "scout");
+    setRawValue(scoutRow, "Match Number", toNumber(entry.matchNumber));
+    setRawValue(scoutRow, "Team Number", teamNumber);
+    setRawValue(scoutRow, "Starting Position", formatStartingPosition(entry.startingPosition));
+    setRawValue(scoutRow, "Alliance", entry.alliance || "");
+    setRawValue(scoutRow, "Auton Climb Level", entry.autonClimbLevel || "");
+    setRawValue(scoutRow, "Teleop Climb Level", entry.teleopClimbLevel || "");
+    setRawValue(scoutRow, "Played Defense", entry.playedDefense ? "Yes" : "No");
+    setRawValue(scoutRow, "Disconnected", entry.disconnected ? "Yes" : "No");
+    setRawValue(scoutRow, "No Show", entry.noShow ? "Yes" : "No");
+    setRawValue(scoutRow, "Estimated Auto Fuel Scored", toNumber(entry.estimatedAutoFuelScored));
+    setRawValue(scoutRow, "Estimated Teleop Fuel Scored", toNumber(entry.estimatedTeleopFuelScored));
+    setRawValue(scoutRow, "Shooting Accuracy", toNumber(entry.shootingAccuracy));
+    setRawValue(scoutRow, "Passed Fuel", entry.passedFuel ? "Yes" : "No");
+    setRawValue(scoutRow, "Passed Fuel Amount", toNumber(entry.passedFuelAmount));
+    setRawValue(scoutRow, "Used Corral", entry.usedCorral ? "Yes" : "No");
+    setRawValue(scoutRow, "Notes", entry.notes || "");
+    setRawValue(scoutRow, "Created At", entry.createdAt || "");
+    rowsToAppend.push(scoutRow);
   }
 
   if (rowsToAppend.length > 0) {

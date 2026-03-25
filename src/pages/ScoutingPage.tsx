@@ -5,6 +5,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { ScoutFormData } from '../model/types';
 import { parseNumberInput } from '../model/utils';
@@ -237,6 +238,20 @@ export function ScoutingPage({
         <fieldset className="rounded-lg border border-[var(--border)] p-4">
           <legend className="px-1 text-sm font-semibold">Overall</legend>
           <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-2 sm:col-span-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="shootingAccuracy">Shooting Accuracy</Label>
+                <span className="text-sm text-muted-foreground">{form.shootingAccuracy}%</span>
+              </div>
+              <Slider
+                id="shootingAccuracy"
+                min={0}
+                max={100}
+                step={5}
+                value={[form.shootingAccuracy]}
+                onValueChange={(values) => updateForm('shootingAccuracy', values[0] ?? 0)}
+              />
+            </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Checkbox
