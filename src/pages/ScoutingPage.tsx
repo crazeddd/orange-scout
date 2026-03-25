@@ -39,8 +39,12 @@ export function ScoutingPage({
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              value={String(form.matchNumber)}
-              onChange={(event) => updateForm('matchNumber', parseNumberInput(event.target.value, 1))}
+              placeholder="1"
+              value={form.matchNumber > 0 ? String(form.matchNumber) : ''}
+              onChange={(event) => {
+                const value = event.target.value;
+                updateForm('matchNumber', value ? parseNumberInput(value, 1) : 0);
+              }}
             />
           </div>
           <div className="space-y-2">
@@ -50,8 +54,12 @@ export function ScoutingPage({
               type="text"
               inputMode="numeric"
               pattern="[0-9]*"
-              value={String(form.teamNumber)}
-              onChange={(event) => updateForm('teamNumber', parseNumberInput(event.target.value, 1))}
+              placeholder="2583"
+              value={form.teamNumber > 0 ? String(form.teamNumber) : ''}
+              onChange={(event) => {
+                const value = event.target.value;
+                updateForm('teamNumber', value ? parseNumberInput(value, 1) : 0);
+              }}
             />
           </div>
           <div className="space-y-2">
