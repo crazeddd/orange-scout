@@ -29,7 +29,7 @@ export function ScoutingPage({
     <Card>
       <CardHeader>
         <CardTitle>{editingId ? 'Edit Scouting Entry' : 'Add Scouting Entry'}</CardTitle>
-        <CardDescription>Yeah.</CardDescription>
+        <CardDescription>Nice.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid gap-3 sm:grid-cols-2">

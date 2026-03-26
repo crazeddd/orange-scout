@@ -315,8 +315,8 @@ function App() {
 
   return (
     <main className="min-h-svh bg-app-bg text-foreground flex flex-col">
-      <header className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg-light)]/60 px-4 py-3">
-        <h1 className="text-lg font-black">Orange Scout</h1>
+      <header className="flex items-end justify-between border-b border-[var(--border)] bg-[var(--bg-light)]/60 px-4 py-3">
+        <h1 className="text-lg leading-8 font-black">Orange Scout</h1>
         <div className="flex items-center gap-3">
           <div className="flex flex-col items-end gap-1">
             <Label htmlFor="scoutNameInput" className="text-xs text-muted-foreground">

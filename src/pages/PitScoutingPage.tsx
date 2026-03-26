@@ -35,7 +35,7 @@ export function PitScoutingPage({
       <Card>
         <CardHeader>
           <CardTitle>{editingPitId ? 'Edit Pit Entry' : 'Pit Scouting'}</CardTitle>
-          <CardDescription>Yeah.</CardDescription>
+          <CardDescription>Nice.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2">
