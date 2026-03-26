@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useTheme } from 'next-themes';
+import { Moon, Sun } from 'lucide-react';
 import { EntriesPage } from './pages/EntriesPage';
 import { ScoutingPage } from './pages/ScoutingPage';
 import { PitScoutingPage } from './pages/PitScoutingPage';
@@ -45,8 +47,14 @@ function App() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
+  const [themeReady, setThemeReady] = useState(false);
+  const { theme, setTheme } = useTheme();
 
   const uploadUrl = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
+
+  useEffect(() => {
+    setThemeReady(true);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(entries));
@@ -314,13 +322,25 @@ function App() {
             <Label htmlFor="scoutNameInput" className="text-xs text-muted-foreground">
               Scout Name
             </Label>
-            <Input
-              id="scoutNameInput"
-              value={scoutName}
-              onChange={(event) => setScoutName(event.target.value)}
-              placeholder="Your name"
-              className="w-32 h-8 text-xs"
-            />
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="h-8 gap-1.5 px-2.5 text-xs"
+                aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              >
+                {themeReady && theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+                {themeReady && theme === 'dark' ? 'Light' : 'Dark'}
+              </Button>
+              <Input
+                id="scoutNameInput"
+                value={scoutName}
+                onChange={(event) => setScoutName(event.target.value)}
+                placeholder="Your name"
+                className="w-32 h-8 text-xs"
+              />
+            </div>
           </div>
         </div>
       </header>
