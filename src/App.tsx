@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { EntriesPage } from './pages/EntriesPage';
 import { ScoutingPage } from './pages/ScoutingPage';
 import { PitScoutingPage } from './pages/PitScoutingPage';
-import { SidebarNav } from './components/SidebarNav';
+import { BottomNav } from './components/BottomNav';
 import { Toaster } from '@/components/ui/sonner';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -14,7 +16,6 @@ import {
   DialogTitle
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { uploadEntries } from './api/uploadEntries';
 import { ActivePage, AppMessage, PitEntry, PitFormData, ScoutEntry, ScoutFormData } from './model/types';
 import {
@@ -305,65 +306,78 @@ function App() {
   };
 
   return (
-    <main className="min-h-svh bg-app-bg text-foreground">
-      <SidebarProvider>
-        <SidebarNav
-          activePage={activePage}
-          setActivePage={setActivePage}
-          pendingCount={totalPendingCount}
-          totalCount={entries.length + pitEntries.length}
-          scoutName={scoutName}
-          setScoutName={setScoutName}
-        />
-        <SidebarInset>
-          <div className="flex items-center gap-2 border-b border-[var(--border)] bg-[var(--bg-light)]/60 px-4 py-3 md:hidden">
-            <SidebarTrigger />
-            <span className="text-sm font-semibold">Orange Scout</span>
+    <main className="min-h-svh bg-app-bg text-foreground flex flex-col">
+      <header className="flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg-light)]/60 px-4 py-3">
+        <h1 className="text-lg font-black">Orange Scout</h1>
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col items-end gap-1">
+            <Label htmlFor="scoutNameInput" className="text-xs text-muted-foreground">
+              Scout Name
+            </Label>
+            <Input
+              id="scoutNameInput"
+              value={scoutName}
+              onChange={(event) => setScoutName(event.target.value)}
+              placeholder="Your name"
+              className="w-32 h-8 text-xs"
+            />
           </div>
-          <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 md:px-6 lg:py-10">
-            {activePage === 'entry' ? (
-              <ScoutingPage
-                editingId={editingId}
-                form={form}
-                updateForm={updateForm}
-                onSave={handleSave}
-                onCancelEdit={() => {
-                  resetForm(scoutName);
-                  setStatusMessage({ type: 'info', text: 'Edit cancelled.' });
-                }}
-              />
-            ) : activePage === 'entries' ? (
-              <EntriesPage
-                entries={entries}
-                pitEntries={pitEntries}
-                pendingCount={totalPendingCount}
-                uploading={uploading}
-                uploadUrl={uploadUrl ?? ''}
-                onUploadPending={handleUploadPending}
-                onEditEntry={startEdit}
-                onDeleteEntry={deleteEntry}
-                onEditPitEntry={editPitEntry}
-                onDeletePitEntry={deletePitEntry}
-                onDeleteAllEntries={deleteAllEntries}
-              />
-            ) : (
-              <PitScoutingPage
-                pitEntries={pitEntries}
-                pitForm={pitForm}
-                editingPitId={editingPitId}
-                updatePitForm={updatePitForm}
-                onSavePitEntry={handleSavePitEntry}
-                onEditPitEntry={editPitEntry}
-                onDeletePitEntry={deletePitEntry}
-                onCancelPitEdit={() => {
-                  resetPitForm();
-                  setPitStatusMessage({ type: 'info', text: 'Pit edit cancelled.' });
-                }}
-              />
-            )}
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
+        </div>
+      </header>
+
+      <div className="flex-grow overflow-y-auto pb-24">
+        <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6 md:px-6 lg:py-10">
+          {activePage === 'entry' ? (
+            <ScoutingPage
+              editingId={editingId}
+              form={form}
+              updateForm={updateForm}
+              onSave={handleSave}
+              onCancelEdit={() => {
+                resetForm(scoutName);
+                setStatusMessage({ type: 'info', text: 'Edit cancelled.' });
+              }}
+            />
+          ) : activePage === 'entries' ? (
+            <EntriesPage
+              entries={entries}
+              pitEntries={pitEntries}
+              pendingCount={totalPendingCount}
+              uploading={uploading}
+              uploadUrl={uploadUrl ?? ''}
+              onUploadPending={handleUploadPending}
+              onEditEntry={startEdit}
+              onDeleteEntry={deleteEntry}
+              onEditPitEntry={editPitEntry}
+              onDeletePitEntry={deletePitEntry}
+              onDeleteAllEntries={deleteAllEntries}
+            />
+          ) : (
+            <PitScoutingPage
+              pitEntries={pitEntries}
+              pitForm={pitForm}
+              editingPitId={editingPitId}
+              updatePitForm={updatePitForm}
+              onSavePitEntry={handleSavePitEntry}
+              onEditPitEntry={editPitEntry}
+              onDeletePitEntry={deletePitEntry}
+              onCancelPitEdit={() => {
+                resetPitForm();
+                setPitStatusMessage({ type: 'info', text: 'Pit edit cancelled.' });
+              }}
+            />
+          )}
+        </div>
+      </div>
+
+      <BottomNav
+        activePage={activePage}
+        setActivePage={setActivePage}
+        pendingCount={totalPendingCount}
+        totalCount={entries.length + pitEntries.length}
+        scoutName={scoutName}
+        setScoutName={setScoutName}
+      />
       <Dialog open={showInstallPrompt} onOpenChange={setShowInstallPrompt}>
         <DialogContent>
           <DialogHeader>
@@ -408,7 +422,7 @@ function App() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Toaster />
+      <Toaster position="top-center" />
     </main>
   );
 }
