@@ -2,6 +2,8 @@ export type Position = 'hub' | 'trench (left)' | 'trench (right)' | 'bump (left)
 export type Alliance = 'red' | 'blue';
 export type ClimbLevel = 'L1' | 'L2' | 'L3' | 'none' | 'failed';
 export type Drivetrain = 'swerve' | 'tank' | 'other';
+export type ScoringCategory = 'low' | 'medium' | 'high';
+export type DrivingQuality = 'good' | 'average' | 'bad';
 
 export type ActivePage = 'entry' | 'entries' | 'pit';
 
@@ -24,9 +26,14 @@ export type ScoutEntry = {
   playedDefense: boolean;
   disconnected: boolean;
   noShow: boolean;
-  estimatedAutoFuelScored: number;
-  estimatedTeleopFuelScored: number;
+  autoScoringCategory: ScoringCategory;
+  scoringCategory: ScoringCategory;
+  missedBallsPerCycle: number;
   shootingAccuracy: number;
+  drivingQuality: DrivingQuality;
+  drivingQualityNotes: string;
+  autoPathSketch: string;
+  defenseRating: number;
   passedFuel: boolean;
   passedFuelAmount: number;
   usedCorral: boolean;

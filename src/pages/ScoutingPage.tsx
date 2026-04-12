@@ -124,16 +124,20 @@ export function ScoutingPage({
             <legend className="px-1 text-sm font-semibold">Auton</legend>
             <div className="space-y-3">
               <div className="space-y-2">
-                <Label htmlFor="estimatedAutoFuelScored">Estimated Auto Fuel Scored</Label>
-                <Input
-                  id="estimatedAutoFuelScored"
-                  type="text"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  value={String(form.estimatedAutoFuelScored)}
-                  onChange={(event) => updateForm('estimatedAutoFuelScored', parseNumberInput(event.target.value, 0))}
-                  placeholder="0"
-                />
+                <Label htmlFor="autoScoringCategory">Auto Scorer Category</Label>
+                <Select
+                  value={form.autoScoringCategory}
+                  onValueChange={(value) => updateForm('autoScoringCategory', value as ScoutFormData['autoScoringCategory'])}
+                >
+                  <SelectTrigger id="autoScoringCategory">
+                    <SelectValue placeholder="Select auto scoring category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low Scorer (1-10)</SelectItem>
+                    <SelectItem value="medium">Medium Scorer (11-40)</SelectItem>
+                    <SelectItem value="high">High Scorer (41+)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="autonClimbLevel">Climb Level</Label>
@@ -159,14 +163,31 @@ export function ScoutingPage({
             <legend className="px-1 text-sm font-semibold">Teleop</legend>
             <div className="space-y-3">
               <div className="space-y-2">
-                <Label htmlFor="estimatedTeleopFuelScored">Estimated Teleop Fuel Scored</Label>
+                <Label htmlFor="scoringCategory">Scoring Category</Label>
+                <Select
+                  value={form.scoringCategory}
+                  onValueChange={(value) => updateForm('scoringCategory', value as ScoutFormData['scoringCategory'])}
+                >
+                  <SelectTrigger id="scoringCategory">
+                    <SelectValue placeholder="Select scoring category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="low">Low Scorer (1-50)</SelectItem>
+                    <SelectItem value="medium">Medium Scorer (50-100)</SelectItem>
+                    <SelectItem value="high">High Scorer (150+)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Overall scorer buckets: low 1-50, medium 50-100, high 150+.</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="missedBallsPerCycle">Missed Balls Per Cycle</Label>
                 <Input
-                  id="estimatedTeleopFuelScored"
+                  id="missedBallsPerCycle"
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  value={String(form.estimatedTeleopFuelScored)}
-                  onChange={(event) => updateForm('estimatedTeleopFuelScored', parseNumberInput(event.target.value, 0))}
+                  value={String(form.missedBallsPerCycle)}
+                  onChange={(event) => updateForm('missedBallsPerCycle', parseNumberInput(event.target.value, 0))}
                   placeholder="0"
                 />
               </div>
@@ -250,6 +271,57 @@ export function ScoutingPage({
                 step={5}
                 value={[form.shootingAccuracy]}
                 onValueChange={(values) => updateForm('shootingAccuracy', values[0] ?? 0)}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="defenseRating">Overall Defense Rating</Label>
+                <span className="text-sm text-muted-foreground">{form.defenseRating}/10</span>
+              </div>
+              <Slider
+                id="defenseRating"
+                min={0}
+                max={10}
+                step={1}
+                value={[form.defenseRating]}
+                onValueChange={(values) => updateForm('defenseRating', values[0] ?? 0)}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="drivingQuality">Driving Quality</Label>
+              <Select
+                value={form.drivingQuality}
+                onValueChange={(value) => updateForm('drivingQuality', value as ScoutFormData['drivingQuality'])}
+              >
+                <SelectTrigger id="drivingQuality">
+                  <SelectValue placeholder="Select driving quality" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="good">Good</SelectItem>
+                  <SelectItem value="average">Average</SelectItem>
+                  <SelectItem value="bad">Bad</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Good: smooth control, smart positioning, avoids traffic. Bad: frequent collisions, poor control, and unreliable pathing.
+              </p>
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="drivingQualityNotes">Driving Quality Notes</Label>
+              <Textarea
+                id="drivingQualityNotes"
+                value={form.drivingQualityNotes}
+                placeholder="Explain why their driving was good, average, or bad."
+                onChange={(event) => updateForm('drivingQualityNotes', event.target.value)}
+              />
+            </div>
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="autoPathSketch">Auto Path Sketch</Label>
+              <Textarea
+                id="autoPathSketch"
+                value={form.autoPathSketch}
+                placeholder="Draw with text, ex: Start -> Left note -> Speaker -> Center note"
+                onChange={(event) => updateForm('autoPathSketch', event.target.value)}
               />
             </div>
             <div className="space-y-2">

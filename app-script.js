@@ -13,9 +13,14 @@ var RAW_HEADERS = [
   "Played Defense",
   "Disconnected",
   "No Show",
-  "Estimated Auto Fuel Scored",
-  "Estimated Teleop Fuel Scored",
+  "Auto Scoring Category",
+  "Scoring Category",
+  "Missed Balls Per Cycle",
   "Shooting Accuracy",
+  "Driving Quality",
+  "Driving Quality Notes",
+  "Auto Path Sketch",
+  "Defense Rating",
   "Passed Fuel",
   "Passed Fuel Amount",
   "Used Corral",
@@ -65,13 +70,13 @@ function getRawValue(row, header) {
 var MASTER_HEADERS = [
   "Team",
   "Scout Entries",
-  "Avg Auto Fuel",
-  "Avg Teleop Fuel",
-  "Avg Total Fuel",
+  "Auto High Scorer %",
+  "Overall High Scorer %",
   "Avg Shooting Accuracy %",
   "Teleop Climb Success %",
   "Auton Climb Success %",
   "Defense %",
+  "Avg Defense Rating",
   "Passed Fuel %",
   "Avg Passed Amount",
   "Disconnected %",
@@ -81,13 +86,13 @@ var MASTER_HEADERS = [
 ];
 
 var MASTER_SORT_OPTIONS = [
-  "Avg Total Fuel",
-  "Avg Auto Fuel",
-  "Avg Teleop Fuel",
+  "Auto High Scorer %",
+  "Overall High Scorer %",
   "Avg Shooting Accuracy %",
   "Teleop Climb Success %",
   "Auton Climb Success %",
   "Defense %",
+  "Avg Defense Rating",
   "Passed Fuel %",
   "Avg Passed Amount",
   "Disconnected %",
@@ -166,12 +171,13 @@ function getLatestPitEntry(pitEntries) {
 
 function deriveTeamStats(teamNumber, pitEntries, scoutEntries) {
   var scoutCount = scoutEntries.length;
-  var autoFuelTotal = 0;
-  var teleFuelTotal = 0;
+  var autoHighScorerCount = 0;
+  var overallHighScorerCount = 0;
   var shootingAccuracyTotal = 0;
   var passedFuelCount = 0;
   var passedFuelAmountTotal = 0;
   var defenseCount = 0;
+  var defenseRatingTotal = 0;
   var disconnectedCount = 0;
   var noShowCount = 0;
   var teleClimbSuccessCount = 0;
@@ -179,14 +185,15 @@ function deriveTeamStats(teamNumber, pitEntries, scoutEntries) {
 
   for (var i = 0; i < scoutEntries.length; i++) {
     var entry = scoutEntries[i];
-    autoFuelTotal += toNumber(entry.estimatedAutoFuelScored);
-    teleFuelTotal += toNumber(entry.estimatedTeleopFuelScored);
+    if ((entry.autoScoringCategory || "") === "high") autoHighScorerCount += 1;
+    if ((entry.scoringCategory || "") === "high") overallHighScorerCount += 1;
     shootingAccuracyTotal += toNumber(entry.shootingAccuracy);
     if (toBool(entry.passedFuel)) {
       passedFuelCount += 1;
       passedFuelAmountTotal += toNumber(entry.passedFuelAmount);
     }
     if (toBool(entry.playedDefense)) defenseCount += 1;
+    defenseRatingTotal += toNumber(entry.defenseRating);
     if (toBool(entry.disconnected)) disconnectedCount += 1;
     if (toBool(entry.noShow)) noShowCount += 1;
     if (isSuccessfulClimb(entry.teleopClimbLevel)) teleClimbSuccessCount += 1;
@@ -198,13 +205,13 @@ function deriveTeamStats(teamNumber, pitEntries, scoutEntries) {
   return {
     teamNumber: teamNumber,
     scoutCount: scoutCount,
-    avgAutoFuel: scoutCount ? autoFuelTotal / scoutCount : 0,
-    avgTeleFuel: scoutCount ? teleFuelTotal / scoutCount : 0,
-    avgTotalFuel: scoutCount ? (autoFuelTotal + teleFuelTotal) / scoutCount : 0,
+    autoHighScorerRate: scoutCount ? (autoHighScorerCount / scoutCount) : 0,
+    overallHighScorerRate: scoutCount ? (overallHighScorerCount / scoutCount) : 0,
     avgShootingAccuracy: scoutCount ? shootingAccuracyTotal / scoutCount : 0,
     teleClimbSuccessRate: scoutCount ? (teleClimbSuccessCount / scoutCount) : 0,
     autonClimbSuccessRate: scoutCount ? (autonClimbSuccessCount / scoutCount) : 0,
     defenseRate: scoutCount ? (defenseCount / scoutCount) : 0,
+    avgDefenseRating: scoutCount ? (defenseRatingTotal / scoutCount) : 0,
     passedFuelRate: scoutCount ? (passedFuelCount / scoutCount) : 0,
     avgPassedFuelAmount: passedFuelCount ? (passedFuelAmountTotal / passedFuelCount) : 0,
     disconnectedRate: scoutCount ? (disconnectedCount / scoutCount) : 0,
@@ -244,13 +251,13 @@ function buildTeamRows(teamNumber, pitEntries, scoutEntries) {
   rows.push(["Scouting Averages"]);
 
   rows.push(["Scout Entries", stats.scoutCount]);
-  rows.push(["Average Auto Fuel", stats.avgAutoFuel.toFixed(2)]);
-  rows.push(["Average Teleop Fuel", stats.avgTeleFuel.toFixed(2)]);
-  rows.push(["Average Total Fuel", stats.avgTotalFuel.toFixed(2)]);
+  rows.push(["Auto High Scorer Rate", asPercent(stats.autoHighScorerRate, 1)]);
+  rows.push(["Overall High Scorer Rate", asPercent(stats.overallHighScorerRate, 1)]);
   rows.push(["Average Shooting Accuracy", stats.avgShootingAccuracy.toFixed(1) + "%"]);
   rows.push(["Teleop Climb Success Rate", asPercent(stats.teleClimbSuccessRate, 1)]);
   rows.push(["Auton Climb Success Rate", asPercent(stats.autonClimbSuccessRate, 1)]);
   rows.push(["Played Defense Rate", asPercent(stats.defenseRate, 1)]);
+  rows.push(["Average Defense Rating", stats.avgDefenseRating.toFixed(2)]);
   rows.push(["Passed Fuel Rate", asPercent(stats.passedFuelRate, 1)]);
   rows.push(["Average Passed Fuel Amount", stats.avgPassedFuelAmount.toFixed(2)]);
   rows.push(["Disconnected Rate", asPercent(stats.disconnectedRate, 1)]);
@@ -264,8 +271,9 @@ function buildTeamRows(teamNumber, pitEntries, scoutEntries) {
     "Scout",
     "Alliance",
     "Starting Position",
-    "Auto Fuel",
-    "Teleop Fuel",
+    "Auto Scorer Category",
+    "Scoring Category",
+    "Missed Per Cycle",
     "Shooting Accuracy",
     "Auton Climb",
     "Teleop Climb",
@@ -273,6 +281,10 @@ function buildTeamRows(teamNumber, pitEntries, scoutEntries) {
     "Passed Amount",
     "Used Corral",
     "Defense",
+    "Defense Rating",
+    "Driving Quality",
+    "Driving Quality Notes",
+    "Auto Path Sketch",
     "Disconnected",
     "No Show",
     "Notes"
@@ -294,8 +306,9 @@ function buildTeamRows(teamNumber, pitEntries, scoutEntries) {
       scout.scoutName || "",
       scout.alliance || "",
       formatStartingPosition(scout.startingPosition),
-      toNumber(scout.estimatedAutoFuelScored),
-      toNumber(scout.estimatedTeleopFuelScored),
+      scout.autoScoringCategory || "",
+      scout.scoringCategory || "",
+      toNumber(scout.missedBallsPerCycle),
       toNumber(scout.shootingAccuracy),
       scout.autonClimbLevel || "",
       scout.teleopClimbLevel || "",
@@ -303,6 +316,10 @@ function buildTeamRows(teamNumber, pitEntries, scoutEntries) {
       toNumber(scout.passedFuelAmount),
       toBool(scout.usedCorral) ? "Yes" : "No",
       toBool(scout.playedDefense) ? "Yes" : "No",
+      toNumber(scout.defenseRating),
+      scout.drivingQuality || "",
+      scout.drivingQualityNotes || "",
+      scout.autoPathSketch || "",
       toBool(scout.disconnected) ? "Yes" : "No",
       toBool(scout.noShow) ? "Yes" : "No",
       scout.notes || ""
@@ -362,9 +379,14 @@ function readRawBuckets(rawSheet) {
       playedDefense: getRawValue(row, "Played Defense"),
       disconnected: getRawValue(row, "Disconnected"),
       noShow: getRawValue(row, "No Show"),
-      estimatedAutoFuelScored: getRawValue(row, "Estimated Auto Fuel Scored"),
-      estimatedTeleopFuelScored: getRawValue(row, "Estimated Teleop Fuel Scored"),
+      autoScoringCategory: getRawValue(row, "Auto Scoring Category"),
+      scoringCategory: getRawValue(row, "Scoring Category"),
+      missedBallsPerCycle: getRawValue(row, "Missed Balls Per Cycle"),
       shootingAccuracy: getRawValue(row, "Shooting Accuracy"),
+      drivingQuality: getRawValue(row, "Driving Quality"),
+      drivingQualityNotes: getRawValue(row, "Driving Quality Notes"),
+      autoPathSketch: getRawValue(row, "Auto Path Sketch"),
+      defenseRating: getRawValue(row, "Defense Rating"),
       passedFuel: getRawValue(row, "Passed Fuel"),
       passedFuelAmount: getRawValue(row, "Passed Fuel Amount"),
       usedCorral: getRawValue(row, "Used Corral"),
@@ -412,7 +434,7 @@ function getSortMetricIndex(metric) {
   for (var i = 0; i < MASTER_HEADERS.length; i++) {
     if (MASTER_HEADERS[i] === metric) return i;
   }
-  return 4; // Avg Total Fuel
+  return 4; // Avg Shooting Accuracy %
 }
 
 function buildMasterSheet(ss, buckets) {
@@ -423,7 +445,7 @@ function buildMasterSheet(ss, buckets) {
 
   var selectedMetric = masterSheet.getRange("B1").getValue();
   if (!selectedMetric || MASTER_SORT_OPTIONS.indexOf(selectedMetric) === -1) {
-    selectedMetric = "Avg Total Fuel";
+    selectedMetric = "Avg Shooting Accuracy %";
   }
 
   masterSheet.clearContents();
@@ -452,13 +474,13 @@ function buildMasterSheet(ss, buckets) {
     rows.push([
       team,
       stats.scoutCount,
-      Number(stats.avgAutoFuel.toFixed(2)),
-      Number(stats.avgTeleFuel.toFixed(2)),
-      Number(stats.avgTotalFuel.toFixed(2)),
+      Number((stats.autoHighScorerRate * 100).toFixed(1)),
+      Number((stats.overallHighScorerRate * 100).toFixed(1)),
       Number(stats.avgShootingAccuracy.toFixed(1)),
       Number((stats.teleClimbSuccessRate * 100).toFixed(1)),
       Number((stats.autonClimbSuccessRate * 100).toFixed(1)),
       Number((stats.defenseRate * 100).toFixed(1)),
+      Number(stats.avgDefenseRating.toFixed(2)),
       Number((stats.passedFuelRate * 100).toFixed(1)),
       Number(stats.avgPassedFuelAmount.toFixed(2)),
       Number((stats.disconnectedRate * 100).toFixed(1)),
@@ -560,9 +582,14 @@ function appendScoutRows(rawSheet, scoutEntries, fallbackScoutName) {
     setRawValue(scoutRow, "Played Defense", entry.playedDefense ? "Yes" : "No");
     setRawValue(scoutRow, "Disconnected", entry.disconnected ? "Yes" : "No");
     setRawValue(scoutRow, "No Show", entry.noShow ? "Yes" : "No");
-    setRawValue(scoutRow, "Estimated Auto Fuel Scored", toNumber(entry.estimatedAutoFuelScored));
-    setRawValue(scoutRow, "Estimated Teleop Fuel Scored", toNumber(entry.estimatedTeleopFuelScored));
+    setRawValue(scoutRow, "Auto Scoring Category", entry.autoScoringCategory || "");
+    setRawValue(scoutRow, "Scoring Category", entry.scoringCategory || "");
+    setRawValue(scoutRow, "Missed Balls Per Cycle", toNumber(entry.missedBallsPerCycle));
     setRawValue(scoutRow, "Shooting Accuracy", toNumber(entry.shootingAccuracy));
+    setRawValue(scoutRow, "Driving Quality", entry.drivingQuality || "");
+    setRawValue(scoutRow, "Driving Quality Notes", entry.drivingQualityNotes || "");
+    setRawValue(scoutRow, "Auto Path Sketch", entry.autoPathSketch || "");
+    setRawValue(scoutRow, "Defense Rating", toNumber(entry.defenseRating));
     setRawValue(scoutRow, "Passed Fuel", entry.passedFuel ? "Yes" : "No");
     setRawValue(scoutRow, "Passed Fuel Amount", toNumber(entry.passedFuelAmount));
     setRawValue(scoutRow, "Used Corral", entry.usedCorral ? "Yes" : "No");

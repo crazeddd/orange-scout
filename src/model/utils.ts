@@ -15,9 +15,14 @@ export const emptyForm = (scoutName: string): ScoutFormData => ({
   playedDefense: false,
   disconnected: false,
   noShow: false,
-  estimatedAutoFuelScored: 0,
-  estimatedTeleopFuelScored: 0,
+  autoScoringCategory: 'low',
+  scoringCategory: 'low',
+  missedBallsPerCycle: 0,
   shootingAccuracy: 0,
+  drivingQuality: 'average',
+  drivingQualityNotes: '',
+  autoPathSketch: '',
+  defenseRating: 0,
   passedFuel: false,
   passedFuelAmount: 0,
   usedCorral: false,
@@ -45,9 +50,25 @@ export const parseStoredEntries = (): ScoutEntry[] => {
       startingPosition: normalizeStartingPosition(entry.startingPosition),
       disconnected: typeof entry.disconnected === 'boolean' ? entry.disconnected : false,
       noShow: typeof entry.noShow === 'boolean' ? entry.noShow : false,
-      estimatedAutoFuelScored: typeof entry.estimatedAutoFuelScored === 'number' ? entry.estimatedAutoFuelScored : 0,
-      estimatedTeleopFuelScored: typeof entry.estimatedTeleopFuelScored === 'number' ? entry.estimatedTeleopFuelScored : 0,
+      autoScoringCategory:
+        entry.autoScoringCategory === 'high' ||
+        entry.autoScoringCategory === 'medium' ||
+        entry.autoScoringCategory === 'low'
+          ? entry.autoScoringCategory
+          : 'low',
+      scoringCategory:
+        entry.scoringCategory === 'high' || entry.scoringCategory === 'medium' || entry.scoringCategory === 'low'
+          ? entry.scoringCategory
+          : 'low',
+      missedBallsPerCycle: typeof entry.missedBallsPerCycle === 'number' ? entry.missedBallsPerCycle : 0,
       shootingAccuracy: typeof entry.shootingAccuracy === 'number' ? entry.shootingAccuracy : 0,
+      drivingQuality:
+        entry.drivingQuality === 'good' || entry.drivingQuality === 'average' || entry.drivingQuality === 'bad'
+          ? entry.drivingQuality
+          : 'average',
+      drivingQualityNotes: typeof entry.drivingQualityNotes === 'string' ? entry.drivingQualityNotes : '',
+      autoPathSketch: typeof entry.autoPathSketch === 'string' ? entry.autoPathSketch : '',
+      defenseRating: typeof entry.defenseRating === 'number' ? entry.defenseRating : 0,
       passedFuel: typeof entry.passedFuel === 'boolean' ? entry.passedFuel : false,
       passedFuelAmount: typeof entry.passedFuelAmount === 'number' ? entry.passedFuelAmount : 0,
       usedCorral: typeof entry.usedCorral === 'boolean' ? entry.usedCorral : false
