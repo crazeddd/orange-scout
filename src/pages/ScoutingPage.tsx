@@ -315,15 +315,6 @@ export function ScoutingPage({
                 onChange={(event) => updateForm('drivingQualityNotes', event.target.value)}
               />
             </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="autoPathSketch">Auto Path Sketch</Label>
-              <Textarea
-                id="autoPathSketch"
-                value={form.autoPathSketch}
-                placeholder="Draw with text, ex: Start -> Left note -> Speaker -> Center note"
-                onChange={(event) => updateForm('autoPathSketch', event.target.value)}
-              />
-            </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Checkbox
