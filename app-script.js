@@ -36,6 +36,7 @@ var RAW_HEADERS = [
 ];
 
 function buildHeaderMap(headers) {
+  headers = Array.isArray(headers) ? headers : [];
   var map = {};
   for (var i = 0; i < headers.length; i++) {
     map[headers[i]] = i;
