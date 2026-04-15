@@ -32,7 +32,6 @@ export type ScoutEntry = {
   shootingAccuracy: number;
   drivingQuality: DrivingQuality;
   drivingQualityNotes: string;
-  autoPathSketch: string;
   defenseRating: number;
   passedFuel: boolean;
   passedFuelAmount: number;

@@ -19,7 +19,6 @@ var RAW_HEADERS = [
   "Shooting Accuracy",
   "Driving Quality",
   "Driving Quality Notes",
-  "Auto Path Sketch",
   "Defense Rating",
   "Passed Fuel",
   "Passed Fuel Amount",
@@ -284,7 +283,6 @@ function buildTeamRows(teamNumber, pitEntries, scoutEntries) {
     "Defense Rating",
     "Driving Quality",
     "Driving Quality Notes",
-    "Auto Path Sketch",
     "Disconnected",
     "No Show",
     "Notes"
@@ -319,7 +317,6 @@ function buildTeamRows(teamNumber, pitEntries, scoutEntries) {
       toNumber(scout.defenseRating),
       scout.drivingQuality || "",
       scout.drivingQualityNotes || "",
-      scout.autoPathSketch || "",
       toBool(scout.disconnected) ? "Yes" : "No",
       toBool(scout.noShow) ? "Yes" : "No",
       scout.notes || ""
@@ -385,7 +382,6 @@ function readRawBuckets(rawSheet) {
       shootingAccuracy: getRawValue(row, "Shooting Accuracy"),
       drivingQuality: getRawValue(row, "Driving Quality"),
       drivingQualityNotes: getRawValue(row, "Driving Quality Notes"),
-      autoPathSketch: getRawValue(row, "Auto Path Sketch"),
       defenseRating: getRawValue(row, "Defense Rating"),
       passedFuel: getRawValue(row, "Passed Fuel"),
       passedFuelAmount: getRawValue(row, "Passed Fuel Amount"),
@@ -588,7 +584,6 @@ function appendScoutRows(rawSheet, scoutEntries, fallbackScoutName) {
     setRawValue(scoutRow, "Shooting Accuracy", toNumber(entry.shootingAccuracy));
     setRawValue(scoutRow, "Driving Quality", entry.drivingQuality || "");
     setRawValue(scoutRow, "Driving Quality Notes", entry.drivingQualityNotes || "");
-    setRawValue(scoutRow, "Auto Path Sketch", entry.autoPathSketch || "");
     setRawValue(scoutRow, "Defense Rating", toNumber(entry.defenseRating));
     setRawValue(scoutRow, "Passed Fuel", entry.passedFuel ? "Yes" : "No");
     setRawValue(scoutRow, "Passed Fuel Amount", toNumber(entry.passedFuelAmount));

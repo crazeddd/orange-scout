@@ -46,7 +46,6 @@ export const uploadEntries = async ({
     shootingAccuracy: entry.shootingAccuracy ?? 0,
     drivingQuality: entry.drivingQuality ?? 'average',
     drivingQualityNotes: entry.drivingQualityNotes ?? '',
-    autoPathSketch: entry.autoPathSketch ?? '',
     defenseRating: entry.defenseRating ?? 0,
     passedFuel: entry.passedFuel ?? false,
     passedFuelAmount: entry.passedFuelAmount ?? 0,

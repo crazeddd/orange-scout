@@ -21,7 +21,6 @@ export const emptyForm = (scoutName: string): ScoutFormData => ({
   shootingAccuracy: 0,
   drivingQuality: 'average',
   drivingQualityNotes: '',
-  autoPathSketch: '',
   defenseRating: 0,
   passedFuel: false,
   passedFuelAmount: 0,
