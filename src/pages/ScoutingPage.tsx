@@ -172,12 +172,12 @@ export function ScoutingPage({
                     <SelectValue placeholder="Select scoring category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Low Scorer (1-50)</SelectItem>
-                    <SelectItem value="medium">Medium Scorer (50-100)</SelectItem>
-                    <SelectItem value="high">High Scorer (150+)</SelectItem>
+                    <SelectItem value="low">Low Scorer (1-100)</SelectItem>
+                    <SelectItem value="medium">Medium Scorer (101-180)</SelectItem>
+                    <SelectItem value="high">High Scorer (180+)</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">Overall scorer buckets: low 1-50, medium 50-100, high 150+.</p>
+                <p className="text-xs text-muted-foreground">Overall scorer buckets: low 1-100, medium 101-180, high 180+.</p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="missedBallsPerCycle">Missed Balls Per Cycle</Label>
